@@ -32,6 +32,8 @@ export class UserController {
 
   @Get('getTestName')
   getTestName() {
+    console.log(this.configService.get('TEST_VALUE').name);
+
     return this.configService.get('TEST_VALUE').name;
   }
 

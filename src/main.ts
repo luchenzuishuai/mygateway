@@ -8,6 +8,9 @@ import { VERSION_NEUTRAL, VersioningType } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AllExceptionFilter } from './common/exception/base.exception.filter';
 import { HttpExceptionFilter } from './common/exception/http.exception.filter';
+import { generateDocument } from './doc';
+
+declare const module: any;
 
 // 底层平台改为使用fastify,替换默认的Express
 async function bootstrap() {
@@ -27,6 +30,17 @@ async function bootstrap() {
 
   // 异常过滤器，注意引入顺序
   app.useGlobalFilters(new AllExceptionFilter(), new HttpExceptionFilter());
+
+  // 创建文档
+  generateDocument(app);
+
+  // 添加热更新
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => {
+      app.close();
+    });
+  }
 
   await app.listen(3000);
 }
